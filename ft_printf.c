@@ -87,7 +87,34 @@ int			ft_putnbr(int n)
 }
 
 // ok ?
-int        put_hex(int n)
+int        ft_adr(unsigned long long n)
+{
+    int i;
+    int ret;
+    char *hex;
+    char str[17];
+
+    i = 0;
+    hex = "0123456789abcdef";
+	ft_putstr("0x");
+    if (n == 0)
+    {
+        ft_putchar('0');
+		return (1);
+    }
+    while (n > 0)
+    {
+        str[i] = hex[n%16];
+        n /= 16;
+        i++;
+    }
+    ret = i;
+    while (--i >= 0)
+		ft_putchar(str[i]);
+    return(ret);
+}
+
+int        put_hex(unsigned int n)
 {
     int i;
     int ret;
@@ -113,7 +140,7 @@ int        put_hex(int n)
     return(ret);
 }
 
-int        put_bighex(int n)
+int        put_bighex(unsigned int n)
 {
     int i;
     int ret;
@@ -150,7 +177,7 @@ int		parsing(char c, va_list args)
 	if (c == 's')
 		ret = ft_putstr(va_arg(args, char *));
 	if (c == 'p') 
-		ret = 0;
+		ret = ft_adr(va_arg(args, unsigned long long));
 	if (c == 'd')
 		ret = ft_putnbr(va_arg(args, int));
 	if (c == 'u')
@@ -164,7 +191,6 @@ int		parsing(char c, va_list args)
 
 	return (ret);
 }
-
 
 // ko
 int		ft_printf(const char *str, ...)
@@ -192,11 +218,14 @@ int		ft_printf(const char *str, ...)
 	}
 	return(out);
 }
+
 /*
 int		main(void)
 {
-	printf("printf = %d\n", printf("the answer to life is %X\n", 987654321));
-	printf("ft_printf = %d\n", ft_printf("the answer to life is %X\n", 987654321));
+	char *str = "sofiane";
+	printf("%%p = %p\n", str);
+	ft_printf("%%p = %p\n", str);
 	return(0);
 }
+
 */
