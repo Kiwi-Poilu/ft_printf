@@ -71,15 +71,13 @@ int		ft_printf(const char *str, ...)
 	while (str[i])
 	{
 		if (str[i] == '%' && str[i + 1])
+		{
+			i++;
 			out += ft_parsing(str, args, &i);
+		}
 		else
 			out += ft_putchar(str[i++]);
 	}
 	va_end(args);
 	return (i);
-}
-
-int		main(void)
-{
-	ft_printf("Sofiane");
 }
