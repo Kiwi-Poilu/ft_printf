@@ -8,184 +8,82 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include "ft_printf.h"
 
-// ok
-int ft_putchar(char c)
-{
-	write(1, &c, 1);
-	return(1);
-}
-
-// ok
-int 	ft_putstr(char *str)
+int		ft_is_type(char c)
 {
 	int i;
+	char *type;
 
+	type = "cspduxX%";
 	i = 0;
-	while(str[i])
+	while (type[i])
 	{
-		ft_putchar(str[i]);
+		if (type[i] == c)
+			return (1);
 		i++;
 	}
-	return(i);
+	return(0);
 }
 
-// ok
-int		ret_putnbr(int n)
+char	ft_typeret(char *str)
 {
 	int i;
+	int j;
+	char type[] = "cspduxX%";
 
 	i = 0;
-	while(n != 0)
+	while (str[i])
 	{
-		n /= 10;
+		j = 0;
+		while (type[j])
+		{
+			if (str[i] == type[j])
+				return (type[j]);
+			j++;
+		}
 		i++;
 	}
-	return(i);
+	return(' ');
 }
 
-//ok
-int		ft_putuns(unsigned int n)
+void	ft_initflags(t_flags *flags)
+{
+	flags->depht = 0;
+	flags->star = 0;
+	flags->minus = 0;
+	flags->zero = 0;
+	flags->dot = 0;
+}
+
+
+void	ft_fillflags(t_flags *flags, char *str)
+{
+	flags->depht = ft_atoi(str);
+}
+
+int		parsing(char *str, va_list args)
 {
 	int ret;
-
-	ret = ret_putnbr(n);
-	if (n >= 10)
-	{
-		ft_putuns(n / 10);
-		ft_putchar(n % 10 + '0');
-	}
-	else
-		ft_putchar(n + '0');
-	return(ret);
-}
-
-// ok
-int			ft_putnbr(int n)
-{
-	int ret;
-
-	ret = ret_putnbr(n);
-	if (n == -2147483648)
-		ft_putstr("-2147483648");
-	else if (n < 0)
-	{
-		ft_putchar('-');
-		ft_putnbr(-n);
-	}
-	else if (n >= 10)
-	{
-		ft_putnbr(n / 10);
-		ft_putchar(n % 10 + '0');
-	}
-	else
-		ft_putchar(n + '0');
-	return (ret);
-}
-
-// ok ?
-int        ft_adr(unsigned long long n)
-{
-    int i;
-    int ret;
-    char *hex;
-    char str[17];
-
-    i = 0;
-    hex = "0123456789abcdef";
-	ft_putstr("0x");
-    if (n == 0)
-    {
-        ft_putchar('0');
-		return (1);
-    }
-    while (n > 0)
-    {
-        str[i] = hex[n%16];
-        n /= 16;
-        i++;
-    }
-    ret = i;
-    while (--i >= 0)
-		ft_putchar(str[i]);
-    return(ret);
-}
-
-int        put_hex(unsigned int n)
-{
-    int i;
-    int ret;
-    char *hex;
-    char str[8];
-
-    i = 0;
-    hex = "0123456789abcdef";
-    if (n == 0)
-    {
-        ft_putchar('0');
-		return (1);
-    }
-    while (n > 0)
-    {
-        str[i] = hex[n%16];
-        n /= 16;
-        i++;
-    }
-    ret = i;
-    while (--i >= 0)
-		ft_putchar(str[i]);
-    return(ret);
-}
-
-int        put_bighex(unsigned int n)
-{
-    int i;
-    int ret;
-    char *hex;
-    char str[8];
-
-    i = 0;
-    hex = "0123456789ABCDEF";
-    if (n == 0)
-    {
-        ft_putchar('0');
-		return (1);
-    }
-    while (n > 0)
-    {
-        str[i] = hex[n%16];
-        n /= 16;
-        i++;
-    }
-    ret = i;
-    while (--i >= 0)
-		ft_putchar(str[i]);
-    return(ret);
-}
-
-// ko
-int		parsing(char c, va_list args)
-{
-	int ret;
-
-	ret = 0;
+	char c;
+	c = ft_typeret(str);
+	t_flags flags;
+	ft_initflags(&flags);
+	ft_fillflags(&flags, str);
 	if (c == 'c')
 		ret = ft_putchar(va_arg(args, int));
 	if (c == 's')
 		ret = ft_putstr(va_arg(args, char *));
 	if (c == 'p') 
-		ret = ft_adr(va_arg(args, unsigned long long));
+		ret = ft_putadr(va_arg(args, unsigned long long));
 	if (c == 'd')
-		ret = ft_putnbr(va_arg(args, int));
+		ret = ft_putnbr(va_arg(args, int), flags);
 	if (c == 'u')
 		ret = ft_putuns(va_arg(args, unsigned int));
 	if (c == 'x')
-		ret = put_hex(va_arg(args, unsigned int));
+		ret = ft_puthex(va_arg(args, unsigned int), c);
 	if (c == 'X')
-		ret = put_bighex(va_arg(args, unsigned int));
+		ret = ft_puthex(va_arg(args, unsigned int), c);
 	if (c == '%')
 		ret = ft_putchar('%');
 
@@ -206,26 +104,18 @@ int		ft_printf(const char *str, ...)
 	{
 		if(str[i] == '%')
 		{
-			i++;
-			out += parsing(str[i], args);
+			out += parsing((char*)(str + (++i)), args);
 			i++;
 		}
 		else
-		{
-			out += ft_putchar(str[i]);
-			i++;
-		}
+			out += ft_putchar(str[i++]);
 	}
-	return(out);
+	return (out);
 }
 
-/*
 int		main(void)
 {
-	char *str = "sofiane";
-	printf("%%p = %p\n", str);
-	ft_printf("%%p = %p\n", str);
+	printf("printf = %d\n", printf("%%d = %10d\n", 678534));
+	printf("ft_printf = %d\n", ft_printf("%%d = %10d\n", 678534));
 	return(0);
 }
-
-*/
