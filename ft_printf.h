@@ -6,7 +6,7 @@
 /*   By: sobouatt <sobouatt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 11:25:34 by sobouatt          #+#    #+#             */
-/*   Updated: 2021/03/08 13:33:22 by sobouatt         ###   ########.fr       */
+/*   Updated: 2021/03/17 14:05:19 by sobouatt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,6 @@ int		ft_puthex(unsigned int n, char c);
 int		parsing(char *str, va_list args);
 int		ft_printf(const char *str, ...);
 int		ft_atoi(char *str);
+void	ft_fill_flags(t_flags *flags, const char *str, int *i);
 
 #endif
